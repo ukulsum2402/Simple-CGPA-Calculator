@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Scientific + CGPA Calculator</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#0f172a;
+  padding:20px;
+  color:#e2e8f0;
+}
+
+.main{
+  width:100%;
+  max-width:500px;
+  position:relative;
+}
+
+.card{
+  background:#1e293b;
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* Navigation */
+.nav-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  margin-bottom:15px;
+  cursor:pointer;
+  font-weight:500;
+  font-size:15px;
+}
+
+.nav-primary{ background:#6366f1; color:white; }
+.nav-secondary{ background:#0ea5e9; color:white; }
+
+/* Display */
+.display{
+  width:100%;
+  height:65px;
+  border:none;
+  border-radius:15px;
+  padding:15px;
+  font-size:22px;
+  text-align:right;
+  background:#0f172a;
+  color:#38bdf8;
+  margin-bottom:15px;
+}
+
+/* Scientific Buttons */
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+}
+
+button{
+  height:55px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:active{
+  transform:scale(0.95);
+}
+
+.number{ background:#334155; color:white; }
+.operator{ background:#2563eb; color:white; }
+.equal{
+  background:#16a34a;
+  color:white;
+  grid-column:span 2;
+}
+.clear{ background:#dc2626; color:white; }
+
+/* CGPA Section */
+.cgpa-box{
+  display:none;
+}
+
+.cgpa-box input{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:none;
+  background:#334155;
+  color:white;
+  font-size:14px;
+}
+
+/* Proper Styled CGPA Buttons */
+.cgpa-btn{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border:none;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.generate-btn{
+  background:#7c3aed;
+  color:white;
+}
+
+.calculate-btn{
+  background:#16a34a;
+  color:white;
+}
+
+.cgpa-btn:hover{
+  opacity:0.9;
+}
+
+.result{
+  margin-top:10px;
+  text-align:center;
+  font-weight:600;
+  white-space:pre-line;
+  color:#38bdf8;
+  padding:10px;
+  background:#334155;
+  border-radius:10px;
+}
+
+/* History Button */
+.history-btn{
+  width:100%;
+  margin-top:15px;
+  background:#f59e0b;
+  color:white;
+  height:45px;
+  border-radius:12px;
+}
+
+/* History Panel */
+.history-panel{
+  position:fixed;
+  bottom:-100%;
+  left:0;
+  width:100%;
+  max-height:60%;
+  background:#1e293b;
+  border-top-left-radius:20px;
+  border-top-right-radius:20px;
+  box-shadow:0 -5px 20px rgba(0,0,0,0.7);
+  padding:20px;
+  overflow-y:auto;
+  transition:0.4s;
+}
+
+.history-panel.active{
+  bottom:0;
+}
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.history-item{
+  background:#334155;
+  padding:8px;
+  margin-bottom:8px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+/* Mobile */
+@media(max-width:480px){
+  .buttons{
+    grid-template-columns:repeat(4,1fr);
+  }
+  .equal{
+    grid-column:span 4;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="main">
+
+<!-- Scientific Calculator -->
+<div class="card" id="scientific">
+
+<button class="nav-btn nav-primary" onclick="showCGPA()">
+Go to CGPA Calculator →
+</button>
+
+<input type="text" id="display" class="display" disabled>
+
+<div class="buttons">
+<button class="clear" onclick="clearDisplay()">C</button>
+<button class="operator" onclick="backspace()">⌫</button>
+<button class="operator" onclick="appendValue('/')">/</button>
+<button class="operator" onclick="appendValue('*')">*</button>
+<button class="operator" onclick="appendValue('-')">-</button>
+
+<button class="number" onclick="appendValue('7')">7</button>
+<button class="number" onclick="appendValue('8')">8</button>
+<button class="number" onclick="appendValue('9')">9</button>
+<button class="operator" onclick="appendValue('+')">+</button>
+<button class="number" onclick="appendValue('4')">4</button>
+
+<button class="number" onclick="appendValue('5')">5</button>
+<button class="number" onclick="appendValue('6')">6</button>
+<button class="number" onclick="appendValue('1')">1</button>
+<button class="number" onclick="appendValue('2')">2</button>
+
+<button class="number" onclick="appendValue('3')">3</button>
+<button class="number" onclick="appendValue('0')">0</button>
+<button class="number" onclick="appendValue('.')">.</button>
+<button class="equal" onclick="calculate()">=</button>
+</div>
+
+<button class="history-btn" onclick="toggleHistory()">View History</button>
+
+</div>
+
+<!-- CGPA Calculator -->
+<div class="card cgpa-box" id="cgpa">
+
+<button class="nav-btn nav-secondary" onclick="showScientific()">
+← Back to Scientific
+</button>
+
+<input type="number" id="subjects" min="1" placeholder="Number of Subjects">
+
+<button class="cgpa-btn generate-btn" onclick="generateInputs()">
+Generate Fields
+</button>
+
+<div id="inputsArea"></div>
+
+<button class="cgpa-btn calculate-btn" onclick="calculateCGPA()">
+Calculate CGPA
+</button>
+
+<div class="result" id="cgpaResult"></div>
+
+<button class="history-btn" onclick="toggleHistory()">View History</button>
+
+</div>
+
+</div>
+
+<!-- History Panel -->
+<div class="history-panel" id="historyPanel">
+<div class="history-header">
+<h3>History</h3>
+<button onclick="clearHistory()">Clear</button>
+<button onclick="toggleHistory()">Close</button>
+</div>
+<div id="historyList"></div>
+</div>
+
+<script>
+let display=document.getElementById("display");
+let historyData=[];
+
+function appendValue(value){ display.value+=value; }
+function clearDisplay(){ display.value=""; }
+function backspace(){ display.value=display.value.slice(0,-1); }
+
+function calculate(){
+  try{
+    let expression=display.value;
+    let result=eval(expression);
+    display.value=result;
+    addHistory(expression+" = "+result);
+  }catch{
+    display.value="Error";
+  }
+}
+
+function showScientific(){
+  document.getElementById("scientific").style.display="block";
+  document.getElementById("cgpa").style.display="none";
+}
+
+function showCGPA(){
+  document.getElementById("scientific").style.display="none";
+  document.getElementById("cgpa").style.display="block";
+}
+
+function generateInputs(){
+  let count=document.getElementById("subjects").value;
+  let area=document.getElementById("inputsArea");
+  area.innerHTML="";
+  for(let i=1;i<=count;i++){
+    area.innerHTML+=`
+      <input type="number" min="0" max="100"
+      placeholder="Subject ${i} Marks (0-100)" id="grade${i}">
+      <input type="number" min="1"
+      placeholder="Subject ${i} Credit" id="credit${i}">
+    `;
+  }
+}
+
+function calculateCGPA(){
+  let count=document.getElementById("subjects").value;
+  let totalMarks=0,totalCredits=0;
+
+  for(let i=1;i<=count;i++){
+    let marks=parseFloat(document.getElementById("grade"+i).value);
+    let credit=parseFloat(document.getElementById("credit"+i).value);
+    if(isNaN(marks)||isNaN(credit)||marks<0||marks>100||credit<=0){
+      document.getElementById("cgpaResult").innerText="Invalid input.";
+      return;
+    }
+    totalMarks+=marks*credit;
+    totalCredits+=credit;
+  }
+
+  let avg=totalMarks/totalCredits;
+  let cgpa=avg/10;
+
+  let resultText="Average: "+avg.toFixed(2)+"%\nCGPA: "+cgpa.toFixed(2)+" / 10";
+  document.getElementById("cgpaResult").innerText=resultText;
+
+  addHistory("CGPA → "+cgpa.toFixed(2));
+}
+
+/* History */
+function addHistory(text){
+  historyData.unshift(text);
+  updateHistory();
+}
+
+function updateHistory(){
+  let list=document.getElementById("historyList");
+  list.innerHTML="";
+  historyData.forEach(item=>{
+    list.innerHTML+=`<div class="history-item">${item}</div>`;
+  });
+}
+
+function toggleHistory(){
+  document.getElementById("historyPanel").classList.toggle("active");
+}
+
+function clearHistory(){
+  historyData=[];
+  updateHistory();
+}
+</script>
+
+</body>
+</html>
